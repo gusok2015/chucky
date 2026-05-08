@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carolina & Chuky</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800,900&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --font-display: 'Cabinet Grotesk', 'Georgia', serif;
+      --font-body: 'Satoshi', 'Helvetica Neue', sans-serif;
+
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --text-hero: clamp(3rem, 1rem + 6vw, 6rem);
+
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-full: 9999px;
+
+      --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ===== PALETA ULTRA MODERNA — NEON DARK ===== */
+    [data-theme="dark"] {
+      --color-bg: #09080f;
+      --color-surface: #110f1e;
+      --color-surface-2: #16132a;
+      --color-border: oklch(0.7 0.1 300 / 0.12);
+
+      --color-text: #f0edf8;
+      --color-text-muted: #9b93b8;
+      --color-text-faint: #5a5274;
+
+      /* Carolina — rosa eléctrico / hot pink */
+      --color-carolina: #ff3d9a;
+      --color-carolina-glow: oklch(0.65 0.28 340 / 0.45);
+      --color-carolina-hover: #ff6bb3;
+      --color-carolina-soft: oklch(0.65 0.28 340 / 0.12);
+
+      /* Chuky — lime neón */
+      --color-chuky: #7fff00;
+      --color-chuky-glow: oklch(0.85 0.28 130 / 0.45);
+      --color-chuky-hover: #a8ff3e;
+      --color-chuky-soft: oklch(0.85 0.28 130 / 0.12);
+
+      /* Acento violeta */
+      --color-accent: #a855f7;
+      --color-accent-soft: oklch(0.62 0.22 300 / 0.15);
+
+      --shadow-md: 0 4px 24px oklch(0 0 0 / 0.5);
+      --shadow-lg: 0 12px 48px oklch(0 0 0 / 0.6);
+    }
+
+    /* ===== BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== CANVAS DE PARTÍCULAS ===== */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== FONDO GRADIENTE MESH ===== */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 20%, oklch(0.55 0.28 340 / 0.15), transparent),
+        radial-gradient(ellipse 50% 60% at 80% 80%, oklch(0.85 0.28 130 / 0.12), transparent),
+        radial-gradient(ellipse 70% 40% at 50% 50%, oklch(0.62 0.22 300 / 0.10), transparent);
+      animation: mesh-shift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes mesh-shift {
+      0%   { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(30deg); }
+    }
+
+    /* ===== LAYOUT PRINCIPAL ===== */
+    .main-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-8) var(--space-4);
+      gap: var(--space-12);
+    }
+
+    /* ===== TÍTULO ===== */
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: var(--text-hero);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg in oklch, #ff3d9a 0%, #a855f7 50%, #7fff00 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 32px oklch(0.62 0.22 300 / 0.4));
+      animation: title-float 4s ease-in-out infinite;
+    }
+
+    @keyframes title-float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-text-muted);
+      text-align: center;
+      margin-top: var(--space-3);
+      font-weight: 500;
+    }
+
+    /* ===== BOTONES ===== */
+    .buttons-row {
+      display: flex;
+      gap: var(--space-8);
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn-main {
+      position: relative;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 900;
+      padding: var(--space-6) var(--space-12);
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+      isolation: isolate;
+      min-width: 220px;
+      text-align: center;
+    }
+
+    .btn-main::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity var(--transition);
+      z-index: -1;
+    }
+
+    .btn-main:hover { transform: translateY(-4px) scale(1.04); }
+    .btn-main:active { transform: translateY(-1px) scale(0.99); }
+    .btn-main:hover::before { opacity: 1; }
+
+    /* ---- Carolina ---- */
+    .btn-carolina {
+      background: linear-gradient(135deg in oklch, #ff1a84 0%, #ff6bb3 60%, #ffb3d9 100%);
+      color: #fff;
+      box-shadow:
+        0 0 0 1px oklch(0.65 0.28 340 / 0.3),
+        0 4px 20px var(--color-carolina-glow),
+        0 0 60px oklch(0.65 0.28 340 / 0.2);
+    }
+    .btn-carolina::before {
+      background: linear-gradient(135deg in oklch, #ff6bb3 0%, #ff3d9a 60%, #cc0066 100%);
+    }
+    .btn-carolina:hover {
+      box-shadow:
+        0 0 0 1px oklch(0.65 0.28 340 / 0.5),
+        0 8px 40px var(--color-carolina-glow),
+        0 0 100px oklch(0.65 0.28 340 / 0.35);
+      filter: brightness(1.1);
+    }
+
+    /* ---- Chuky ---- */
+    .btn-chuky {
+      background: linear-gradient(135deg in oklch, #5dc800 0%, #7fff00 60%, #c8ff80 100%);
+      color: #0a1a00;
+      box-shadow:
+        0 0 0 1px oklch(0.85 0.28 130 / 0.3),
+        0 4px 20px var(--color-chuky-glow),
+        0 0 60px oklch(0.85 0.28 130 / 0.2);
+    }
+    .btn-chuky::before {
+      background: linear-gradient(135deg in oklch, #8eff20 0%, #5dc800 60%, #3d8800 100%);
+    }
+    .btn-chuky:hover {
+      box-shadow:
+        0 0 0 1px oklch(0.85 0.28 130 / 0.5),
+        0 8px 40px var(--color-chuky-glow),
+        0 0 100px oklch(0.85 0.28 130 / 0.35);
+      filter: brightness(1.1);
+    }
+
+    /* Texto del botón con emoji flotante */
+    .btn-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      justify-content: center;
+    }
+    .btn-emoji {
+      display: inline-block;
+      animation: emoji-bounce 1.8s ease-in-out infinite;
+      font-size: 1.2em;
+    }
+    .btn-chuky .btn-emoji { animation-delay: 0.4s; }
+
+    @keyframes emoji-bounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      35%       { transform: translateY(-6px) scale(1.2) rotate(-10deg); }
+      65%       { transform: translateY(-3px) scale(1.1) rotate(8deg); }
+    }
+
+    /* ===== PANEL DE REACCIÓN ===== */
+    .reaction-panel {
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      text-align: center;
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    .reaction-panel.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .reaction-panel.carolina-msg { color: var(--color-carolina); }
+    .reaction-panel.chuky-msg { color: var(--color-chuky); }
+
+    /* ===== PARTÍCULAS FLOTANTES (emojis css) ===== */
+    .floating-emojis {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .float-item {
+      position: absolute;
+      font-size: clamp(1.2rem, 2vw, 2rem);
+      animation: float-up linear infinite;
+      will-change: transform, opacity;
+      user-select: none;
+    }
+
+    @keyframes float-up {
+      0%   { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
+      10%  { opacity: 1; }
+      80%  { opacity: 0.8; }
+      100% { transform: translateY(-10vh) rotate(720deg) scale(1.2); opacity: 0; }
+    }
+
+    /* Explosión al hacer click */
+    .burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10;
+      font-size: 2.2rem;
+      animation: burst-out 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes burst-out {
+      0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+      60%  { opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3) rotate(var(--angle, 45deg)); opacity: 0; }
+    }
+
+    /* ===== FOOTER ===== */
+    .footer-tag {
+      position: relative;
+      z-index: 1;
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      text-align: center;
+      margin-top: var(--space-8);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .buttons-row { flex-direction: column; gap: var(--space-6); }
+      .btn-main { width: 100%; max-width: 320px; font-size: var(--text-lg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true"></div>
+
+  <!-- Emojis de fondo siempre flotando -->
+  <div class="floating-emojis" id="bg-emojis" aria-hidden="true"></div>
+
+  <main class="main-wrapper">
+    <div>
+      <h1 class="hero-title">💫 Click!</h1>
+      <p class="hero-subtitle">¿A quién le toca hoy? 🎉</p>
+    </div>
+
+    <div class="buttons-row" role="group" aria-label="Elegir persona">
+      <button class="btn-main btn-carolina" id="btn-carolina" onclick="triggerBurst(event, 'carolina')" aria-label="Carolina">
+        <span class="btn-label">
+          <span class="btn-emoji">❤️</span>
+          Carolina
+          <span class="btn-emoji">❤️</span>
+        </span>
+      </button>
+
+      <button class="btn-main btn-chuky" id="btn-chuky" onclick="triggerBurst(event, 'chuky')" aria-label="Chuky">
+        <span class="btn-label">
+          <span class="btn-emoji">🐶</span>
+          Chuky
+          <span class="btn-emoji">🐶</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="reaction-panel" id="reaction" aria-live="polite"></div>
+  </main>
+
+  <p class="footer-tag">con amor ✨ Hecho especialmente para ti</p>
+
+  <script>
+    // ===== MENSAJES DE REACCIÓN =====
+    const msgs = {
+      carolina: [
+        "❤️ ¡Carolina es la más hermosa! 💖",
+        "🌸 ¡Carolina brilla con luz propia! ✨",
+        "💕 ¡Carolina, queen total! 👑",
+        "🦋 ¡Nadie como Carolina! 💫",
+        "💝 ¡Carolina is EVERYTHING! 🔥"
+      ],
+      chuky: [
+        "🐶 ¡Chuky el perrito más adorable! 🐾",
+        "🐕 ¡Chuky manda ladridos de amor! 💚",
+        "🦴 ¡Chuky es el mejor compañero! 🌿",
+        "🐶 ¡Woof woof, Chuky reina! 🐾",
+        "💚 ¡Chuky, el más fiel y lindo! 🎾"
+      ]
+    };
+
+    // ===== EMOJIS DE FONDO FLOTANTES =====
+    const bgEmojis = ['❤️','💕','🐶','🐾','🌸','✨','💖','🦋','💫','🐕','💝','🌺','🎀','🐩','💞'];
+    const container = document.getElementById('bg-emojis');
+
+    function createFloater() {
+      const el = document.createElement('span');
+      el.classList.add('float-item');
+      el.textContent = bgEmojis[Math.floor(Math.random() * bgEmojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      const duration = 6 + Math.random() * 10;
+      const delay = Math.random() * 8;
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = delay + 's';
+      el.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+      el.style.opacity = (0.3 + Math.random() * 0.5).toString();
+      container.appendChild(el);
+      setTimeout(() => el.remove(), (duration + delay) * 1000 + 500);
+    }
+
+    // Llenar con 20 flotadores iniciales
+    for (let i = 0; i < 20; i++) createFloater();
+    setInterval(createFloater, 600);
+
+    // ===== EXPLOSIÓN AL HACER CLICK =====
+    const carolinaEmojis = ['❤️','💕','💖','🌸','💝','🦋','💞','🌺','🎀','✨'];
+    const chukyEmojis    = ['🐶','🐾','🐕','💚','🦴','🎾','🌿','🐩','🍀','🐕‍🦺'];
+
+    function triggerBurst(event, who) {
+      const emojis = who === 'carolina' ? carolinaEmojis : chukyEmojis;
+      const count = 16;
+      const cx = event.clientX, cy = event.clientY;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.classList.add('burst');
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        const angle = (360 / count) * i + (Math.random() * 30 - 15);
+        const dist = 80 + Math.random() * 80;
+        const rad = angle * (Math.PI / 180);
+        el.style.left = cx + 'px';
+        el.style.top  = cy + 'px';
+        el.style.setProperty('--angle', angle + 'deg');
+        el.style.fontSize = (1.5 + Math.random()) + 'rem';
+        el.style.animationDelay = (Math.random() * 0.1) + 's';
+        // Aplicar movimiento radial extra via transform en el keyframe
+        el.style.setProperty('--tx', Math.cos(rad) * dist + 'px');
+        el.style.setProperty('--ty', Math.sin(rad) * dist + 'px');
+
+        // Override animation para que también se muevan en la dirección
+        el.style.animation = `burst-spread 0.9s cubic-bezier(0.16, 1, 0.3, 1) ${el.style.animationDelay} forwards`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+      }
+
+      // Mostrar mensaje de reacción
+      const panel = document.getElementById('reaction');
+      panel.classList.remove('visible', 'carolina-msg', 'chuky-msg');
+      void panel.offsetWidth; // reflow
+      const list = msgs[who];
+      panel.textContent = list[Math.floor(Math.random() * list.length)];
+      panel.classList.add('visible', who + '-msg');
+
+      // Vibración táctil si disponible
+      if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+    }
+  </script>
+
+  <style>
+    @keyframes burst-spread {
+      0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+      60%  { opacity: 1; }
+      100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(var(--angle, 45deg));
+        opacity: 0;
+      }
+    }
+  </style>
+</body>
+</html>
